@@ -1,0 +1,105 @@
+---
+title: "Practicing Joins"
+author: "Clarissa Boyajian"
+date: "8/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(palmerpenguins)
+```
+
+## Warm-up Practice:
+
+#### Refresher 1:
+```{r}
+refresher_1 <- penguins %>% 
+  filter(island %in% c("Biscoe", "Dream")) %>% 
+  select(-year, -sex) %>%
+  mutate(body_mass_kg = body_mass_g / 1000) %>% 
+  rename(location = island)
+```
+
+#### Refresh 2:
+```{r}
+refresher_2 <- penguins %>% 
+  filter(species == "Adelie") %>% 
+  drop_na(flipper_length_mm, sex) %>% 
+  group_by(sex) %>% 
+  summarise(
+    mean_flip = mean(flipper_length_mm),
+    sd_flip = sd(flipper_length_mm),
+    sample_size = n()
+  )
+```
+
+
+
+# **Practice Joins:**
+
+#### Importing table using `datapasta` (not to replace reading in a file)
+```{r}
+animals <- tibble::tribble(
+  ~location,   ~species,  ~maturity,
+   "lagoon",   "bobcat",    "adult",
+    "bluff",   "coyote", "juvenile",
+    "creek",      "fox",    "adult",
+     "oaks", "squirrel", "juvenile",
+    "bluff",   "bobcat",    "adult"
+  )
+
+sites <- tibble::tribble(
+  ~location,      ~full_site_name, ~jurisdiction,
+   "beach",       "Goleta Beach",     "SB City",
+  "lagoon",        "UCSB Lagoon",        "UCSB",
+   "bluff",       "Ellwood Mesa",     "SB City",
+    "oaks", "Fremont Campground",        "USFS",
+  )
+```
+
+## Mutating joins:
+
+#### Full join:
+```{r}
+animals_full_join <- full_join(x = animals, y = sites, by = "location")
+
+#If you have multiple locations under site for a key indicator then you'll get duplicate lines (will combine y row info to all x rows that match for both x rows)
+```
+
+#### Left join:
+```{r}
+animals_left_join <- left_join(x = animals, y = sites, by = "location")
+```
+
+#### Inner join: 
+```{r}
+animals_inner_join <- inner_join(x = animals, y = sites, by = "location")
+```
+
+## Filter joins:
+
+#### Semi join: 
+```{r}
+animals_semi_join <- semi_join(x = animals, y = sites, by = "location")
+```
+
+#### Anti join:
+```{r}
+animals_anti_join <- anti_join(x = animals, y = sites, by = "location")
+
+sites_anti_join <- anti_join(x = sites, y = animals, b = "location")
+
+join_pipe <- animals %>% 
+  full_join(sites) %>% 
+  inner_join(animals_anti_join)
+#If piping together joins, make sure to check after each step ALWAYS
+```
+
+
+
+
+
+
+
