@@ -1,0 +1,113 @@
+---
+title: "Working with Dates and Times"
+author: "Clarissa Boyajian"
+date: "8/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(lubridate)
+```
+
+## Play around with functions in `lubridate`
+```{r}
+my_date <- "03-15-1998"
+class(my_date)
+```
+
+Optional orders possible: `ymd()`, `mdy()`, `dmy()`
+```{r}
+my_date_new <- lubridate::mdy(my_date)
+class(my_date_new)
+```
+
+#### Try converting the following to dates:
+
+- 4/6/2005 (mdy)
+- 20100806 (ymd)
+- 12-Jun-1974
+- your birthday
+
+```{r}
+ex_1 <- "4/6/2005"
+print(lubridate::mdy(ex_1))
+
+ex_2 <- "20100806"
+print(lubridate::ymd(ex_2))
+
+ex_3 <- "12-Jun-1974"
+print(lubridate::dmy(ex_3))
+
+ex_4 <- "May 23, 1990"
+print(lubridate::mdy(ex_4))
+
+ex_5 <- c("6/12/1990", "050370")
+print(lubridate::mdy(ex_5))
+```
+
+#### Times:
+Good to use 24 hour clock
+```{r}
+time <- "2020-08-12 11:18"
+ex_5 <- lubridate::ymd_hm(time)
+ex_5
+#Currently reported in UTC (Uuniversale Greenwich time)
+class(ex_5)
+
+time_la <- with_tz(ex_5, "America/Los_Angeles")
+time_la
+```
+
+#### Practice: 
+- create date time
+- convert to time in Sydney Australia
+```{r}
+time_2 <- "2021/08/17 20:46"
+time_syd <- with_tz(time_2, "Australia/Sydney")
+time_syd
+```
+
+#### Pull out week/day/etc. using lubridate
+*helpful if you're wanting to add a new column (using `mutate()`) with just a piece of the date - time*
+```{r}
+lubridate::week(time_syd)
+#tells you the week of the year
+lubridate::day(time_syd)
+#tells you the day of the year
+lubridate::minute(time_syd)
+```
+*find what day of the week a date was one*
+```{r}
+my_bday <- lubridate::ymd("1990-05-23")
+class(my_bday)
+
+wday(my_bday, label = TRUE)
+```
+
+#### Manipulating dates in a tibble
+```{r}
+urchin_counts <- tribble(
+  ~date, ~species, ~size_mm,
+  "10/3//2020", "purple", 55,
+  "10/4/2020", "red", 48,
+  "11/17/2020", "red", 67
+)
+
+# Have to have info stored as a date class for lubridate functions to work
+urchin_counts_ymd <- urchin_counts %>% 
+  mutate(date = lubridate::mdy(date)) %>% 
+  mutate(year = year(date),
+         month = month(date))
+
+```
+
+
+
+
+
+
+
+
+
